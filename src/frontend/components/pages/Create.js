@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import { create as ipfsHttpClient } from "ipfs-http-client";
 import { Form, Row, Button } from "react-bootstrap";
+import { uploadToIPFS } from "../helpers/IPFSUpload";
+import { createNFT } from "../helpers/CreateNFT";
+import { ListNFT } from "../helpers/ListNFT";
 
-const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
+const client = ipfsHttpClient(process.env.REACT_APP_IPFS_CLIENT);
 
 function Create({ marketplace, nft }) {
   const [loading, setLoading] = useState(false);
@@ -14,49 +17,20 @@ function Create({ marketplace, nft }) {
     name: "",
   });
 
-  const uploadToIPFS = async (event) => {
+  const onUploadChange = async (event) => {
     event.preventDefault();
     const file = event.target.files[0];
-    if (typeof file !== "undefined") {
-      try {
-        const result = await client.add(file);
-        console.log(result);
-        setItem({
-          ...item,
-          image: `https://ipfs.infura.io/ipfs/${result.path}`,
-        });
-      } catch (err) {
-        console.log(`Error uploading to IPFS: ${err}`);
-      }
-    }
+    const result = await uploadToIPFS(client, file);
+    setItem({ ...item, image: result.path });
   };
 
-  const createNFT = async () => {
+  const onCreatePress = async () => {
     const { image, name, description, price } = item;
+    console.log({image, name, description, price});
     if (!image || !name || !description || !price) return;
-    try {
-      const result = await client.add(
-        JSON.stringify({ name, image, description })
-      );
-      mintThenList(result);
-    } catch (err) {
-      console.log(`Error creating NFT: ${err}`);
-    }
-  };
-
-  const mintThenList = async (result) => {
-    const { price } = item;
-    const url = `https://ipfs.infura.io/ipfs/${result.path}`;
-    // mint NFT
-    await (await nft.mint(url)).wait();
-    // Get token of new NFT
-    const id = await nft._tokenCount();
-    // Approve marketplace to sell NFT
-    await (await nft.setApprovalForAll(marketplace.address, true)).wait();
-    // Add NFT to marketplace
-    const listingPrice = await ethers.utils.parseEther(price.toString());
-
-    await (await marketplace.makeItem(nft.address, id, listingPrice)).wait();
+    const result = await createNFT(client, image, name, description);
+    await ListNFT(nft, marketplace, result.path, price);
+    setItem({ image: "", price: null, description: "", name: "" });
   };
 
   const handleInputChange = (e) => {
@@ -77,7 +51,7 @@ function Create({ marketplace, nft }) {
                 type="file"
                 required
                 name="file"
-                onChange={uploadToIPFS}
+                onChange={onUploadChange}
               />
               <Form.Control
                 onChange={(e) => handleInputChange(e)}
@@ -104,7 +78,7 @@ function Create({ marketplace, nft }) {
                 placeholder="Price in ETH"
               />
               <div className="d-grid px-0">
-                <Button onClick={createNFT} variant="primary" size="lg">
+                <Button onClick={onCreatePress} variant="primary" size="lg">
                   Create & List NFT!
                 </Button>
               </div>

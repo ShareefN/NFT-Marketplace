@@ -5,14 +5,15 @@ const Navigation = ({ web3Handler, account }) => {
   return (
     <Navbar expand="lg" bg="secondary" variant="dark">
       <Container>
-        <Navbar.Brand href="/">
-          &nbsp; NFT Marketplace
-        </Navbar.Brand>
+        <Navbar.Brand href="/">&nbsp; NFT Marketplace</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">
               Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/mint">
+              Mint
             </Nav.Link>
             <Nav.Link as={Link} to="/create">
               Create

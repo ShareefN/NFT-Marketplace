@@ -14,13 +14,13 @@ function Home({ marketplace, nft }) {
   const laodMarketplaceItems = async () => {
     // Load items count from the bloackchain
     const count = await marketplace._itemCount();
-    // console.log("this is the count ", count?._hex);
+    console.log("this is the count ", count.toString());
     // Init items array
     let items = [];
     // Iterate and store items in the array
-    for (var i = 1; i < count; i++) {
+    for (var i = 0; i < count.toString(); i++) {
       // Get item from the blockchain
-      let item = await marketplace._items(i);
+      let item = await marketplace._items(1);
       if (!item._isSold) {
         // Get URI url from NFT contract
         const uri = await nft.tokenURI(item?._tokenId);

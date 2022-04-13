@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import Create from "./pages/Create";
 import MyListed from "./pages/MyListedItems";
 import MyPurchases from "./pages/MyPurchases";
+import Mint from "./pages/Mint";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -63,7 +64,11 @@ function App() {
               path="/"
               element={<Home marketplace={marketplace} nft={nft} />}
             />
-            <Route path="/create" element={<Create marketplace={marketplace} nft={nft}/>} />
+            <Route path="/mint" element={<Mint />} />
+            <Route
+              path="/create"
+              element={<Create marketplace={marketplace} nft={nft} />}
+            />
             <Route path="/my-listed-items" element={<MyListed />} />
             <Route path="/my-purchases" element={<MyPurchases />} />
           </Routes>
